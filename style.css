@@ -1,0 +1,12 @@
+body{
+    overflow: hidden;
+    background-color: #202020;
+    margin: 0;
+  }
+  canvas{
+    position: fixed;
+    top: 20; 
+    left: 30;
+    width: 100px;
+    height: 100px;
+}
