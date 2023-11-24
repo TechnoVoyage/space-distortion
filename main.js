@@ -4,8 +4,9 @@ let element_position = 0;
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.127.0/build/three.module.js";
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.127.0/examples/jsm/controls/OrbitControls.js";
 
-const massPosotions = {center : {x: 0, y : 0}, noncenter : {x:0, y: 0}}
-let magnetPosition = {x: 0, y:0, z:360}
+const TARGET_X = 6;
+const massPosotions = { center: { x: 0, y: 0 }, noncenter: { x: 0, y: 0 } }
+let magnetPosition = { x: 0, y: 0, z: 360 }
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(45, 1920 / 1000, 1, 1000);
 camera.position.set(0, 20, 800).setLength(50);
@@ -159,7 +160,7 @@ renderer.setAnimationLoop(_ => {
     document.getElementById('move_back_button').disabled = false;
   }
   let t = clock.getElapsedTime() * 0.5;
-  if (uniforms.spherePosition.value.getComponent(2) < 14 && element_position == 1) {
+  if (uniforms.spherePosition.value.getComponent(2) < TARGET_X - 1 && element_position == 1) {
     if (!clock.running) {
       clock.start();
     }
@@ -207,9 +208,10 @@ function animateSphere(t) {
 
 function setPosition(p, t) {
   p.set(
-    0, // Math.cos(t * 0.314) * 15,
+    //  Math.cos(t * 0.314) * 10,
     0,
-    Math.sin(t * 1) * 15
+    0,
+    Math.sin(t * 1) * TARGET_X
   )
 }
 
@@ -284,6 +286,6 @@ serialWebSocket.onerror = function (err) {
   ws.close();
 };
 serialWebSocket.onopen = (event) => {
-    serialWebSocket.send("G28\r\n")
+  serialWebSocket.send("G28\r\n")
 };
 console.log('penis')

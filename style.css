@@ -8,10 +8,19 @@
   text-align: center;
   z-index: 2;
   font-size: 45pt;
-  left: 50%;
-  position: absolute;
-}
 
+}
+#mass-text {
+  font-family: 'Tahoma';
+  color: white;
+  font-size: 30pt;
+  /* background-color: #3d3a3a;
+  border-color: white; */
+  /* border-style: solid; */
+  border-radius: 10px;
+  padding: 10px;
+  
+}
 body {
   overflow: hidden;
   background-color: #202020;
@@ -24,7 +33,19 @@ button {
   border-color: white;
   background-color: #3d3a3a;
   border-radius: 10px;
-  font-size: 40pt;
+  font-size: 30pt;
+  color: white;
+}
+
+button:disabled {
+  background-color: rgb(23, 22, 22);
+  color: #3d3a3a;
+  border-color: #3d3a3a;
+}
+button:active{
+  /* background-color: rgb(23, 22, 22); */
+  /* color: #3d3a3a; */
+  border-color: #3d3a3a;
 }
 canvas {
   position: absolute;
