@@ -1,29 +1,29 @@
-console.clear();
-
+var serialWebSocket = new WebSocket("ws://127.0.0.1:8000")
 let element_position = 0;
 
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.127.0/build/three.module.js";
-import {OrbitControls} from "https://cdn.jsdelivr.net/npm/three@0.127.0/examples/jsm/controls/OrbitControls.js";
-import {GUI} from "https://cdn.jsdelivr.net/npm/three@0.127.0/examples/jsm/libs/dat.gui.module.js";
+import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.127.0/examples/jsm/controls/OrbitControls.js";
 
+const massPosotions = {center : {x: 0, y : 0}, noncenter : {x:0, y: 0}}
+let magnetPosition = {x: 0, y:0, z:360}
 let scene = new THREE.Scene();
-let camera = new THREE.PerspectiveCamera(45, 700 / 500, 1, 1000);
+let camera = new THREE.PerspectiveCamera(45, 1920 / 1000, 1, 1000);
 camera.position.set(0, 20, 800).setLength(50);
 const renderer = new THREE.WebGLRenderer({
-    canvas: document.querySelector('#bg')
+  canvas: document.querySelector('#bg')
 });
-renderer.setSize(700, 500);
+renderer.setSize(1920, 1080);
 renderer.setClearColor(0x202020);
 document.body.appendChild(renderer.domElement);
 
 let controls = new OrbitControls(camera, renderer.domElement);
 
 let uniforms = {
-  spherePosition: {value: new THREE.Vector3()},
-  radius: {value: 4},
-  planeHeight: {value: -4},
-  bendHeight: {value: 0.80}, // of radius [0..1],
-  smoothness: {value: 5}
+  spherePosition: { value: new THREE.Vector3() },
+  radius: { value: 4 },
+  planeHeight: { value: -3 },
+  bendHeight: { value: 0.9 }, // of radius [0..1],
+  smoothness: { value: 10 }
 }
 
 let gs = new THREE.IcosahedronGeometry(1, 7);
@@ -31,15 +31,15 @@ let c1 = new THREE.Color(0x00ffff);
 let c2 = new THREE.Color(0xff00ff);
 let c = new THREE.Color();
 let clrs = [];
-for(let i = 0; i < gs.attributes.position.count; i++){
+for (let i = 0; i < gs.attributes.position.count; i++) {
   c.lerpColors(c1, c2, (1 - gs.attributes.position.getY(i)) / 2);
   clrs.push(c.r, c.g, c.b);
 }
 gs.setAttribute("color", new THREE.Float32BufferAttribute(clrs, 3));
 
 let ms = new THREE.PointsMaterial({
-  size: 3, 
-  vertexColors: false,
+  size: 0.5,
+  vertexColors: true,
   onBeforeCompile: shader => {
     shader.fragmentShader = shader.fragmentShader.replace(
       `#include <clipping_planes_fragment>`,
@@ -57,7 +57,7 @@ s.userData = {
   posNext: new THREE.Vector3(),
   rotAxis: new THREE.Vector3(),
   dist: new THREE.Vector3(),
-  
+
 }
 setPosition(s.userData.posPrev, 0);
 scene.add(s)
@@ -65,7 +65,7 @@ scene.add(s)
 let gpl = new THREE.PlaneGeometry(40, 40, 100, 100);
 gpl.rotateX(Math.PI * -0.5);
 let mpl = new THREE.PointsMaterial({
-  size: 0.15, 
+  size: 0.15,
   color: 0xffffff,
   onBeforeCompile: shader => {
     shader.uniforms.spherePosition = uniforms.spherePosition;
@@ -73,7 +73,7 @@ let mpl = new THREE.PointsMaterial({
     shader.uniforms.planeHeight = uniforms.planeHeight;
     shader.uniforms.bendHeight = uniforms.bendHeight;
     shader.uniforms.smoothness = uniforms.smoothness;
-    
+
     shader.vertexShader = `
       uniform vec3 spherePosition;
       uniform float radius;
@@ -144,45 +144,46 @@ scene.add(pl);
 // gui.add(uniforms.bendHeight, "value", 0.01, 0.99).name("bend at");
 // gui.add(uniforms.smoothness, "value", 0, 50).name("smoothness");
 
-window.addEventListener( 'resize', onWindowResize );
+//window.addEventListener( 'resize', onWindowResize );
 
 let clock = new THREE.Clock();
 
 let time_buffer = 0;
-renderer.setAnimationLoop( _ => {
-    if (element_position == 0){
-        document.getElementById('move_forward_button').disabled = false;
-        document.getElementById('move_back_button').disabled = true;
-    }
-    else{
-        document.getElementById('move_forward_button').disabled = true;
-        document.getElementById('move_back_button').disabled = false;
-    }
+renderer.setAnimationLoop(_ => {
+  if (element_position == 0) {
+    document.getElementById('move_forward_button').disabled = false;
+    document.getElementById('move_back_button').disabled = true;
+  }
+  else {
+    document.getElementById('move_forward_button').disabled = true;
+    document.getElementById('move_back_button').disabled = false;
+  }
   let t = clock.getElapsedTime() * 0.5;
-  if (uniforms.spherePosition.value.getComponent(2) < 14 && element_position == 1){
-    if (!clock.running){
-        clock.start();
+  if (uniforms.spherePosition.value.getComponent(2) < 14 && element_position == 1) {
+    if (!clock.running) {
+      clock.start();
     }
     animateSphere(t);
   }
-  else if (uniforms.spherePosition.value.getComponent(2) > 0 && element_position == 0){
-    if (!clock.running){
-        clock.start();
-        clock.elapsedTime = time_buffer;
+  else if (uniforms.spherePosition.value.getComponent(2) > 0 && element_position == 0) {
+    if (!clock.running) {
+      clock.start();
+      clock.elapsedTime = time_buffer;
     }
     animateSphere(t);
-    
+
   }
-  else{
+  else {
     time_buffer = clock.elapsedTime;
     clock.stop();
   }
   uniforms.spherePosition.value.copy(s.position);
-	renderer.render(scene, camera);
+  // camera.position.y = pl.position.y
+  renderer.render(scene, camera);
 })
 
-function animateSphere(t){
-  
+function animateSphere(t) {
+
   let pPrev = s.userData.posPrev;
   let pNext = s.userData.posNext;
   let rotAxis = s.userData.rotAxis;
@@ -191,81 +192,98 @@ function animateSphere(t){
   setPosition(pNext, t + 0.001);
   rotAxis.subVectors(pNext, s.position);
   rotAxis.set(rotAxis.z, 0, -rotAxis.x).normalize();
- 
-  
+
+
   let d = dist.subVectors(s.position, pPrev).length();
   let dFull = 2 * Math.PI * uniforms.radius.value;
   let aRatio = d / dFull;
   let a = Math.PI * 2 * aRatio;
-    
+
   s.rotateOnWorldAxis(rotAxis, a);
-  
+
   pPrev.copy(s.position);
-  
-}
-
-function setPosition(p, t){
-    p.set(
-        0, // Math.cos(t * 0.314) * 15,
-        0,
-        Math.sin(t * 1) * 15
-    )
-}
-
-function onWindowResize() {
-
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
-
-  renderer.setSize( innerWidth, innerHeight );
 
 }
 
-document.getElementById('move_forward_button').onclick = function() {
-    element_position = 1;
-    document.getElementById('move_back_button').disabled = true;
+function setPosition(p, t) {
+  p.set(
+    0, // Math.cos(t * 0.314) * 15,
+    0,
+    Math.sin(t * 1) * 15
+  )
 }
-document.getElementById('move_back_button').onclick = function() {
-    element_position = 0;
-    document.getElementById('move_forward_button').disabled = true;
-}
-document.getElementById('move_down_button').onclick = function() {
-    document.getElementById('move_up_button').disabled = false;
-    
-    let counter = 0;
-    if ( uniforms.planeHeight.value < 5){
-        let interval = setInterval(function() {
-            uniforms.planeHeight.value += 0.1;
-            counter += 1;
-            if (counter == 15){
-                clearInterval(interval);
-            }
 
-        }, 20)
-    }
-    else{
-        document.getElementById('move_down_button').disabled = true;
-    }
-     
-    
-}
-document.getElementById('move_up_button').onclick = function() {
-    document.getElementById('move_down_button').disabled = false;
-    let counter = 0;
-    if ( uniforms.planeHeight.value > -5){
-        let interval = setInterval(function() {
-            uniforms.planeHeight.value -= 0.1;
-            counter += 1;
-            if (counter == 15){
-                clearInterval(interval);
-            }
+// function onWindowResize() {
 
-        }, 20)
-        }
-    else{
-        document.getElementById('move_up_button').disabled = true;
-    }
-     
-    
+//   camera.aspect = innerWidth / innerHeight;
+//   camera.updateProjectionMatrix();
+
+//   renderer.setSize( innerWidth, innerHeight );
+
+// }
+
+document.getElementById('move_forward_button').onclick = function () {
+  element_position = 1;
+  document.getElementById('move_back_button').disabled = true;
 }
+document.getElementById('move_back_button').onclick = function () {
+  element_position = 0;
+  document.getElementById('move_forward_button').disabled = true;
+}
+document.getElementById('move_down_button').onclick = function () {
+  // camera.position.y += 1;
+  document.getElementById('move_up_button').disabled = false;
+
+  let counter = 0;
+  if (uniforms.planeHeight.value < 5) {
+    let interval = setInterval(function () {
+      camera.position.y += 0.1;
+      uniforms.planeHeight.value += 0.1;
+      counter += 1;
+      if (counter == 15) {
+        clearInterval(interval);
+      }
+
+    }, 20)
+  }
+  else {
+    document.getElementById('move_down_button').disabled = true;
+  }
+
+
+}
+document.getElementById('move_up_button').onclick = function () {
+
+  serialWebSocket.send("G0")
+  document.getElementById('move_down_button').disabled = false;
+  let counter = 0;
+  if (uniforms.planeHeight.value > -5) {
+    let interval = setInterval(function () {
+      camera.position.y -= 0.1;
+      uniforms.planeHeight.value -= 0.1;
+      counter += 1;
+      if (counter == 15) {
+        clearInterval(interval);
+      }
+
+    }, 20)
+  }
+  else {
+    document.getElementById('move_up_button').disabled = true;
+  }
+}
+serialWebSocket.onclose = function (e) {
+  console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
+  setTimeout(function () {
+    serialWebSocket = new WebSocket("ws://127.0.0.1:8000")
+  }, 1000);
+};
+
+serialWebSocket.onerror = function (err) {
+  console.error('Socket encountered error: ', err.message, 'Closing socket');
+  ws.close();
+};
+serialWebSocket.onopen = (event) => {
+    serialWebSocket.send("G28\r\n")
+};
 console.log('penis')

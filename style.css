@@ -1,12 +1,41 @@
-body{
-    overflow: hidden;
-    background-color: #202020;
-    margin: 0;
-  }
-  canvas{
-    position: fixed;
-    top: 20; 
-    left: 30;
-    width: 100px;
-    height: 100px;
+@font-face {
+  font-family: 'Tahoma';
+  src: url('fonts/tahoma.ttf');
+}
+
+#main-header {
+  color: white;
+  text-align: center;
+  z-index: 2;
+  font-size: 45pt;
+  left: 50%;
+  position: absolute;
+}
+
+body {
+  overflow: hidden;
+  background-color: #202020;
+  margin: 0;
+  font-family: 'Tahoma';
+}
+button {
+  font-family: 'Tahoma';
+  border-style: solid;
+  border-color: white;
+  background-color: #3d3a3a;
+  border-radius: 10px;
+  font-size: 40pt;
+}
+canvas {
+  position: absolute;
+  top: 20;
+  left: 30;
+  width: 100px;
+  height: 100px;
+  z-index: -1;
+  /* border-style: solid; */
+  border-color: white;
+  border-radius: 10px;
+  border-width: 1px;
+
 }
