@@ -1,15 +1,20 @@
 var serialWebSocket = new WebSocket("ws://127.0.0.1:8000")
 let element_position = 0;
 
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.127.0/build/three.module.js";
-import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.127.0/examples/jsm/controls/OrbitControls.js";
+import * as THREE from './node_modules/three/build/three.module.js';
 
 const TARGET_X = 6;
-const massPosotions = { center: { x: 0, y: 0 }, noncenter: { x: 0, y: 0 } }
-let magnetPosition = { x: 0, y: 0, z: 360 }
+var step = 1
+const massPositions = { center: { x: 100, y:10 }, noncenter: { x: 2 , y: 0 } }
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(45, 1920 / 1000, 1, 1000);
-camera.position.set(0, 20, 800).setLength(50);
+let masExp = 5
+let printerStepZ = 10
+let printerPosition = { x: massPositions.center.x, y: massPositions.center.y, z: 365 }
+const masText = document.getElementById("mass-text")
+//camera.position.set(0, 20, 800).setLength(50);
+camera.position.set(30, 6, 0)
+camera.rotation.set(-1.5, 1.2, 1.5)
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#bg')
 });
@@ -17,8 +22,10 @@ renderer.setSize(1920, 1080);
 renderer.setClearColor(0x202020);
 document.body.appendChild(renderer.domElement);
 
-let controls = new OrbitControls(camera, renderer.domElement);
-
+//let controls = new OrbitControls(camera, renderer.domElement);
+function movePrinter() {
+  serialWebSocket.send(`G0 X${printerPosition.x} Y${printerPosition.y} Z${printerPosition.z}\r\n`)
+}
 let uniforms = {
   spherePosition: { value: new THREE.Vector3() },
   radius: { value: 4 },
@@ -151,14 +158,6 @@ let clock = new THREE.Clock();
 
 let time_buffer = 0;
 renderer.setAnimationLoop(_ => {
-  if (element_position == 0) {
-    document.getElementById('move_forward_button').disabled = false;
-    document.getElementById('move_back_button').disabled = true;
-  }
-  else {
-    document.getElementById('move_forward_button').disabled = true;
-    document.getElementById('move_back_button').disabled = false;
-  }
   let t = clock.getElapsedTime() * 0.5;
   if (uniforms.spherePosition.value.getComponent(2) < TARGET_X - 1 && element_position == 1) {
     if (!clock.running) {
@@ -175,6 +174,14 @@ renderer.setAnimationLoop(_ => {
 
   }
   else {
+    if (element_position == 0) {
+      document.getElementById('move_forward_button').disabled = false;
+      document.getElementById('move_back_button').disabled = true;
+    }
+    else {
+      document.getElementById('move_forward_button').disabled = true;
+      document.getElementById('move_back_button').disabled = false;
+    }
     time_buffer = clock.elapsedTime;
     clock.stop();
   }
@@ -225,12 +232,20 @@ function setPosition(p, t) {
 // }
 
 document.getElementById('move_forward_button').onclick = function () {
+  printerPosition.x = massPositions.noncenter.x;
+  printerPosition.y = massPositions.noncenter.y;
+  movePrinter();
   element_position = 1;
   document.getElementById('move_back_button').disabled = true;
+  document.getElementById('move_forward_button').disabled = true;
 }
 document.getElementById('move_back_button').onclick = function () {
+  printerPosition.x = massPositions.center.x;
+  printerPosition.y = massPositions.center.y;
+  movePrinter();
   element_position = 0;
   document.getElementById('move_forward_button').disabled = true;
+  document.getElementById('move_back_button').disabled = true;
 }
 document.getElementById('move_down_button').onclick = function () {
   // camera.position.y += 1;
@@ -238,41 +253,50 @@ document.getElementById('move_down_button').onclick = function () {
 
   let counter = 0;
   if (uniforms.planeHeight.value < 5) {
+    step += 1
+    masText.innerHTML = `Масса: 10<sup>${masExp * step}</sup> кг`
     let interval = setInterval(function () {
+      document.getElementById('move_down_button').disabled = true;
       camera.position.y += 0.1;
       uniforms.planeHeight.value += 0.1;
       counter += 1;
       if (counter == 15) {
+        document.getElementById('move_down_button').disabled = false;
         clearInterval(interval);
       }
 
     }, 20)
+    //printerPosition.z -= printerStepZ;
   }
-  else {
-    document.getElementById('move_down_button').disabled = true;
-  }
+
+  if (step == 7) document.getElementById('move_down_button').disabled = true;
 
 
 }
 document.getElementById('move_up_button').onclick = function () {
-
-  serialWebSocket.send("G0")
+  console.log(camera.position)
+  console.log(camera.rotation)
   document.getElementById('move_down_button').disabled = false;
   let counter = 0;
-  if (uniforms.planeHeight.value > -5) {
+  if (uniforms.planeHeight.value > -3) {
+    step -= 1;
+    masText.innerHTML = `Масса: 10<sup>${masExp * step}</sup> кг`
     let interval = setInterval(function () {
+      document.getElementById('move_up_button').disabled = true;
       camera.position.y -= 0.1;
       uniforms.planeHeight.value -= 0.1;
       counter += 1;
       if (counter == 15) {
+        document.getElementById('move_up_button').disabled = false;
         clearInterval(interval);
       }
 
     }, 20)
+    printerPosition.z += printerStepZ;
+    movePrinter()
   }
-  else {
-    document.getElementById('move_up_button').disabled = true;
-  }
+  if (step == 1) document.getElementById('move_up_button').disabled = true;
+
 }
 serialWebSocket.onclose = function (e) {
   console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
@@ -286,6 +310,11 @@ serialWebSocket.onerror = function (err) {
   ws.close();
 };
 serialWebSocket.onopen = (event) => {
+  // serialWebSocket.send("G0 F1500\r\n")
   serialWebSocket.send("G28\r\n")
+  printerPosition.x = massPositions.center.x;
+  printerPosition.y = massPositions.center.y;
+  
+  setTimeout(6000, movePrinter()) 
 };
 console.log('penis')
