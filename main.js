@@ -5,7 +5,8 @@ import * as THREE from './node_modules/three/build/three.module.js';
 
 const TARGET_X = 6;
 var step = 1
-const massPositions = { center: { x: 100, y:10 }, noncenter: { x: 2 , y: 0 } }
+var element_speed = 1
+const massPositions = { center: { x: 100, y:0 }, noncenter: { x: -60 , y:0 } }
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(45, 1920 / 1000, 1, 1000);
 let masExp = 5
@@ -163,6 +164,7 @@ renderer.setAnimationLoop(_ => {
     if (!clock.running) {
       clock.start();
     }
+    element_speed = 0.4;
     animateSphere(t);
   }
   else if (uniforms.spherePosition.value.getComponent(2) > 0 && element_position == 0) {
@@ -170,6 +172,7 @@ renderer.setAnimationLoop(_ => {
       clock.start();
       clock.elapsedTime = time_buffer;
     }
+    element_speed = 0.9;
     animateSphere(t);
 
   }
@@ -218,7 +221,7 @@ function setPosition(p, t) {
     //  Math.cos(t * 0.314) * 10,
     0,
     0,
-    Math.sin(t * 1) * TARGET_X
+    Math.sin(t * element_speed) * TARGET_X
   )
 }
 
@@ -266,7 +269,8 @@ document.getElementById('move_down_button').onclick = function () {
       }
 
     }, 20)
-    //printerPosition.z -= printerStepZ;
+    printerPosition.z -= printerStepZ;
+    movePrinter()
   }
 
   if (step == 7) document.getElementById('move_down_button').disabled = true;
@@ -310,11 +314,9 @@ serialWebSocket.onerror = function (err) {
   ws.close();
 };
 serialWebSocket.onopen = (event) => {
-  // serialWebSocket.send("G0 F1500\r\n")
   serialWebSocket.send("G28\r\n")
   printerPosition.x = massPositions.center.x;
   printerPosition.y = massPositions.center.y;
-  
-  setTimeout(6000, movePrinter()) 
+  movePrinter() 
 };
 console.log('penis')
