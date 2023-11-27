@@ -160,11 +160,10 @@ let clock = new THREE.Clock();
 let time_buffer = 0;
 renderer.setAnimationLoop(_ => {
   let t = clock.getElapsedTime() * 0.5;
-  if (uniforms.spherePosition.value.getComponent(2) < TARGET_X - 1 && element_position == 1) {
+  if (uniforms.spherePosition.value.getComponent(2) < TARGET_X - 0.1 && element_position == 1) {
     if (!clock.running) {
       clock.start();
     }
-    element_speed = 0.4;
     animateSphere(t);
   }
   else if (uniforms.spherePosition.value.getComponent(2) > 0 && element_position == 0) {
@@ -172,7 +171,6 @@ renderer.setAnimationLoop(_ => {
       clock.start();
       clock.elapsedTime = time_buffer;
     }
-    element_speed = 0.9;
     animateSphere(t);
 
   }
@@ -221,7 +219,7 @@ function setPosition(p, t) {
     //  Math.cos(t * 0.314) * 10,
     0,
     0,
-    Math.sin(t * element_speed) * TARGET_X
+    Math.sin(t * 1) * TARGET_X
   )
 }
 
