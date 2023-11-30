@@ -6,12 +6,13 @@ import * as THREE from './node_modules/three/build/three.module.js';
 const TARGET_X = 6;
 var step = 1
 var element_speed = 1
-const massPositions = { center: { x: 100, y:0 }, noncenter: { x: -60 , y:0 } }
+//const massPositions = { center: { x:50, y:-50 }, noncenter: { x:-50 , y:50 } }
+const massPositions = { center: { x:14, y:14 }, noncenter: { x:60 , y:0 } }
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(45, 1920 / 1000, 1, 1000);
 let masExp = 5
-let printerStepZ = 10
-let printerPosition = { x: massPositions.center.x, y: massPositions.center.y, z: 365 }
+let printerStepZ = 20
+let printerPosition = { x: massPositions.center.x, y: massPositions.center.y, z: 350 }
 const masText = document.getElementById("mass-text")
 //camera.position.set(0, 20, 800).setLength(50);
 camera.position.set(30, 6, 0)
@@ -176,12 +177,12 @@ renderer.setAnimationLoop(_ => {
   }
   else {
     if (element_position == 0) {
-      document.getElementById('move_forward_button').disabled = false;
+      document.getElementById('move_forward_button').disabled = true;
       document.getElementById('move_back_button').disabled = true;
     }
     else {
       document.getElementById('move_forward_button').disabled = true;
-      document.getElementById('move_back_button').disabled = false;
+      document.getElementById('move_back_button').disabled = true;
     }
     time_buffer = clock.elapsedTime;
     clock.stop();
@@ -316,9 +317,18 @@ serialWebSocket.onerror = function (err) {
   ws.close();
 };
 serialWebSocket.onopen = (event) => {
+  // printerPosition.z -= 60;
+  // movePrinter()
+  // //serialWebSocket.send("G0 X0 Y0\r\n")
+  // serialWebSocket.send("G28\r\n")
+  // // serialWebSocket.send("G0 X0 Y0 Z150\r\n")
+  
+
   serialWebSocket.send("G28\r\n")
-  printerPosition.x = massPositions.center.x;
-  printerPosition.y = massPositions.center.y;
+  // printerPosition.x = massPositions.center.x;
+  // printerPosition.y = massPositions.center.y;
+  // printerPosition.z = 
+  // serialWebSocket.send(`G0 X${massPositions.center.x} Y${massPositions.center.y}\r\n`)
   movePrinter() 
 };
 console.log('penis')
