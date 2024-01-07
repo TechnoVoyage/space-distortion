@@ -25,7 +25,7 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(1920, 1080);
 renderer.setClearColor(0x202020);
 document.body.appendChild(renderer.domElement);
-
+document.getElementById("move_back_button").disabled = true
 //let controls = new OrbitControls(camera, renderer.domElement);
 function movePrinter() {
   serialWebSocket.send(`G0 X${printerPosition.x} Y${printerPosition.y} Z${printerPosition.z}\r\n`)
@@ -150,13 +150,6 @@ let mpl = new THREE.PointsMaterial({
 let pl = new THREE.Points(gpl, mpl);
 scene.add(pl);
 
-// let gui = new GUI();
-// gui.add(uniforms.radius, "value", 1, 5).name("sphere radius").onChange(v => {s.scale.setScalar(v)});
-// gui.add(uniforms.planeHeight, "value", -5, 5).name("plane height");
-// gui.add(uniforms.bendHeight, "value", 0.01, 0.99).name("bend at");
-// gui.add(uniforms.smoothness, "value", 0, 50).name("smoothness");
-
-//window.addEventListener( 'resize', onWindowResize );
 
 let clock = new THREE.Clock();
 
@@ -178,20 +171,7 @@ renderer.setAnimationLoop(_ => {
 
   }
   else {
-    if (element_position == 0) {
-      if (!shot_started) {
-        document.getElementById('move_forward_button').disabled = false;
-        document.getElementById('move_back_button').disabled = true;
-        document.getElementById('shot_button').disabled = false;
-      }
-    }
-    else {
-      if (!shot_started) {
-        document.getElementById('move_forward_button').disabled = true;
-        document.getElementById('move_back_button').disabled = false;
-        document.getElementById('shot_button').disabled = false;
-      }
-    }
+    if(!shot_started) unblockButtons();
     time_buffer = clock.elapsedTime;
     clock.stop();
   }
@@ -232,14 +212,6 @@ function setPosition(p, t) {
   )
 }
 
-// function onWindowResize() {
-
-//   camera.aspect = innerWidth / innerHeight;
-//   camera.updateProjectionMatrix();
-
-//   renderer.setSize( innerWidth, innerHeight );
-
-// }
 
 
 document.getElementById('move_forward_button').onclick = function () {
@@ -247,9 +219,7 @@ document.getElementById('move_forward_button').onclick = function () {
   printerPosition.y = massPositions.noncenter.y;
   movePrinter();
   element_position = 1;
-  document.getElementById('move_back_button').disabled = true;
-  document.getElementById('move_forward_button').disabled = true;
-  document.getElementById('shot_button').disabled = true;
+  blockButtons();
 }
 
 document.getElementById('move_back_button').onclick = function () {
@@ -257,26 +227,19 @@ document.getElementById('move_back_button').onclick = function () {
   printerPosition.y = massPositions.center.y;
   movePrinter();
   element_position = 0;
-  document.getElementById('move_forward_button').disabled = true;
-  document.getElementById('move_back_button').disabled = true;
-  document.getElementById('shot_button').disabled = true;
+  blockButtons();
 }
 
 document.getElementById('shot_button').onclick = function () {
 
   shootBalls()
   shot_started = true
-  document.getElementById('move_back_button').disabled = true;
-  document.getElementById('move_forward_button').disabled = true;
-  document.getElementById('shot_button').disabled = true;
-  document.getElementById('move_down_button').disabled = true;
-  document.getElementById('move_up_button').disabled = true;
+  blockButtons()
   setTimeout(function () {
     clearBalls()
     setTimeout(function () {
       shot_started = false
-      if (step != 7) document.getElementById('move_down_button').disabled = false;
-      if (step != 1) document.getElementById('move_up_button').disabled = false;
+      unblockButtons();
     }, CLEAR_TIME)
   }, SHOT_TIME)
 
@@ -337,6 +300,20 @@ document.getElementById('move_up_button').onclick = function () {
   }
   if (step == 1) document.getElementById('move_up_button').disabled = true;
 
+}
+function blockButtons() {
+  document.getElementById('move_forward_button').disabled = true;
+  document.getElementById('move_back_button').disabled = true;
+  document.getElementById('shot_button').disabled = true;
+  document.getElementById('move_down_button').disabled = true;
+  document.getElementById('move_up_button').disabled = true;
+}
+function unblockButtons() {
+  if (element_position == 0) document.getElementById('move_forward_button').disabled = false;
+  if (element_position == 1) document.getElementById('move_back_button').disabled = false;
+  document.getElementById('shot_button').disabled = false;
+  if (step != 7) document.getElementById('move_down_button').disabled = false;
+  if (step != 1) document.getElementById('move_up_button').disabled = false;
 }
 function shootBalls() {
   console.log("shot!")
