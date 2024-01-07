@@ -30,12 +30,24 @@ body {
 button {
   font-family: 'Tahoma';
   border-style: solid;
-  border-color: white;
-  background-color: #3d3a3a;
+  border-color: rgb(222, 214, 214);
+  background-color: #363434;
   border-radius: 10px;
   font-size: 30pt;
   color: white;
 }
+
+
+button:hover {
+  box-shadow: rgba(45, 35, 66, 0.4) 0 4px 8px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
+  transform: translateY(-2px);
+}
+
+button:active {
+  box-shadow: #D6D6E7 0 3px 7px inset;
+  transform: translateY(2px);
+}
+
 
 button:disabled {
   background-color: rgb(23, 22, 22);
