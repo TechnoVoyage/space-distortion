@@ -5,10 +5,11 @@ import * as THREE from './node_modules/three/build/three.module.js';
 
 const TARGET_X = 6;
 const SHOT_TIME = 10000;
-var shot_started = false 
+const CLEAR_TIME = 10000;
+var shot_started = false
 var step = 1
 var element_speed = 1
-const massPositions = { center: { x: 100, y:0 }, noncenter: { x: -60 , y:0 } }
+const massPositions = { center: { x: 100, y: 0 }, noncenter: { x: -60, y: 0 } }
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(45, 1920 / 1000, 1, 1000);
 let masExp = 5
@@ -178,14 +179,14 @@ renderer.setAnimationLoop(_ => {
   }
   else {
     if (element_position == 0) {
-      if (!shot_started){
+      if (!shot_started) {
         document.getElementById('move_forward_button').disabled = false;
         document.getElementById('move_back_button').disabled = true;
         document.getElementById('shot_button').disabled = false;
       }
     }
     else {
-      if (!shot_started){
+      if (!shot_started) {
         document.getElementById('move_forward_button').disabled = true;
         document.getElementById('move_back_button').disabled = false;
         document.getElementById('shot_button').disabled = false;
@@ -255,7 +256,7 @@ document.getElementById('move_back_button').onclick = function () {
   printerPosition.x = massPositions.center.x;
   printerPosition.y = massPositions.center.y;
   movePrinter();
-  element_position = 0; 
+  element_position = 0;
   document.getElementById('move_forward_button').disabled = true;
   document.getElementById('move_back_button').disabled = true;
   document.getElementById('shot_button').disabled = true;
@@ -263,30 +264,20 @@ document.getElementById('move_back_button').onclick = function () {
 
 document.getElementById('shot_button').onclick = function () {
 
-
+  shootBalls()
   shot_started = true
   document.getElementById('move_back_button').disabled = true;
   document.getElementById('move_forward_button').disabled = true;
   document.getElementById('shot_button').disabled = true;
   document.getElementById('move_down_button').disabled = true;
   document.getElementById('move_up_button').disabled = true;
-
-  let interval = setInterval(function () {
-    shot_started = false
-    if (printerPosition.z == 365){
-      document.getElementById('move_up_button').disabled = true;
-      document.getElementById('move_down_button').disabled = false;
-    }
-    else if (printerPosition.z == 305){
-      document.getElementById('move_up_button').disabled = false;
-      document.getElementById('move_down_button').disabled = true;
-    }
-    else{
-      document.getElementById('move_up_button').disabled = false;
-      document.getElementById('move_down_button').disabled = false;
-    }
-    clearInterval(interval);
-
+  setTimeout(function () {
+    clearBalls()
+    setTimeout(function () {
+      shot_started = false
+      if (step != 7) document.getElementById('move_down_button').disabled = false;
+      if (step != 1) document.getElementById('move_up_button').disabled = false;
+    }, CLEAR_TIME)
   }, SHOT_TIME)
 
 }
@@ -341,11 +332,17 @@ document.getElementById('move_up_button').onclick = function () {
 
     }, 20)
     printerPosition.z += printerStepZ;
-    
+
     movePrinter()
   }
   if (step == 1) document.getElementById('move_up_button').disabled = true;
 
+}
+function shootBalls() {
+  console.log("shot!")
+}
+function clearBalls() {
+  serialWebSocket.send("G28\r\n")
 }
 serialWebSocket.onclose = function (e) {
   console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
@@ -362,6 +359,6 @@ serialWebSocket.onopen = (event) => {
   serialWebSocket.send("G28\r\n")
   printerPosition.x = massPositions.center.x;
   printerPosition.y = massPositions.center.y;
-  movePrinter() 
+  movePrinter()
 };
 console.log('penis')
