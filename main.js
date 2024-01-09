@@ -14,7 +14,7 @@ let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(45, 1920 / 1000, 1, 1000);
 let masExp = 5
 let printerStepZ = 10
-let printerPosition = { x: massPositions.center.x, y: massPositions.center.y, z: 365 }
+let printerPosition = { x: massPositions.center.x, y: massPositions.center.y, z: 350 }
 const masText = document.getElementById("mass-text")
 //camera.position.set(0, 20, 800).setLength(50);
 camera.position.set(30, 6, 0)
@@ -28,6 +28,7 @@ document.body.appendChild(renderer.domElement);
 document.getElementById("move_back_button").disabled = true
 //let controls = new OrbitControls(camera, renderer.domElement);
 function movePrinter() {
+  serialWebSocket.send(`G90\r\n`)
   serialWebSocket.send(`G0 X${printerPosition.x} Y${printerPosition.y} Z${printerPosition.z}\r\n`)
 }
 let uniforms = {
@@ -171,7 +172,7 @@ renderer.setAnimationLoop(_ => {
 
   }
   else {
-    if(!shot_started) unblockButtons();
+    if (!shot_started) unblockButtons();
     time_buffer = clock.elapsedTime;
     clock.stop();
   }
