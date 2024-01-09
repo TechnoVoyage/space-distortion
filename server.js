@@ -10,7 +10,10 @@ wss.on('connection', function connection(ws) {
   ws.on('message', function message(msg) {
     console.log(String(msg))
     if (String(msg) == "shoot") {
-      shooter_serialport.write(1)
+      var _buf = new Buffer();
+      _buf.alloc(1);
+      _buf[0] = 0x01
+      shooter_serialport.write(_buf)
     } else { //gcode
       printer_serialport.write(msg)
     }
