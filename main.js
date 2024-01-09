@@ -218,6 +218,7 @@ function setPosition(p, t) {
 document.getElementById('move_forward_button').onclick = function () {
   printerPosition.x = massPositions.noncenter.x;
   printerPosition.y = massPositions.noncenter.y;
+  printerPosition.z += 20;
   movePrinter();
   element_position = 1;
   blockButtons();
@@ -226,6 +227,7 @@ document.getElementById('move_forward_button').onclick = function () {
 document.getElementById('move_back_button').onclick = function () {
   printerPosition.x = massPositions.center.x;
   printerPosition.y = massPositions.center.y;
+  printerPosition.z -= 20;
   movePrinter();
   element_position = 0;
   blockButtons();
