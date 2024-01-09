@@ -322,7 +322,6 @@ function shootBalls() {
 }
 function clearBalls() {
   serialWebSocket.send("G28\r\n")
-  serialWebSocket.send("G92 X0 Y0 Z0\r\n")
   printerPosition.x = massPositions.center.x;
   printerPosition.y = massPositions.center.y;
   movePrinter()
