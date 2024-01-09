@@ -4,12 +4,12 @@ let element_position = 0;
 import * as THREE from './node_modules/three/build/three.module.js';
 
 const TARGET_X = 6;
-const SHOT_TIME = 10000;
-const CLEAR_TIME = 10000;
+const SHOT_TIME = 20000;
+const CLEAR_TIME = 5000;
 var shot_started = false
 var step = 1
 var element_speed = 1
-const massPositions = { center: { x: 0, y: 0 }, noncenter: { x: -100, y: -100 } }
+const massPositions = { center: { x: 0, y: 0 }, noncenter: { x: 100, y: 100 } }
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(45, 1920 / 1000, 1, 1000);
 let masExp = 5
