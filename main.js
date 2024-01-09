@@ -274,7 +274,7 @@ document.getElementById('move_down_button').onclick = function () {
     movePrinter()
   }
 
-  if (step == 7) document.getElementById('move_down_button').disabled = true;
+  if (step == 5) document.getElementById('move_down_button').disabled = true;
 
 
 }
