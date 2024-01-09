@@ -14,7 +14,7 @@ let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(45, 1920 / 1000, 1, 1000);
 let masExp = 5
 let printerStepZ = 10
-let printerPosition = { x: massPositions.center.x, y: massPositions.center.y, z: 350 }
+let printerPosition = { x: massPositions.center.x, y: massPositions.center.y, z: 0 }
 const masText = document.getElementById("mass-text")
 //camera.position.set(0, 20, 800).setLength(50);
 camera.position.set(30, 6, 0)
@@ -322,6 +322,7 @@ function shootBalls() {
 }
 function clearBalls() {
   serialWebSocket.send("G28\r\n")
+  serialWebSocket.send("G92 X0 Y0 Z0\r\n")
   printerPosition.x = massPositions.center.x;
   printerPosition.y = massPositions.center.y;
   movePrinter()
@@ -338,9 +339,7 @@ serialWebSocket.onerror = function (err) {
   ws.close();
 };
 serialWebSocket.onopen = (event) => {
-  serialWebSocket.send("G28\r\n")
-  printerPosition.x = massPositions.center.x;
-  printerPosition.y = massPositions.center.y;
+  clearBalls();
   movePrinter()
 };
 console.log('penis')
