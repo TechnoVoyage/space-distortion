@@ -9,12 +9,12 @@ const CLEAR_TIME = 5000;
 var shot_started = false
 var step = 1
 var element_speed = 1
-const massPositions = { center: { x: 0, y: 0 }, noncenter: { x: 100, y: 100 } }
+const massPositions = { center: { x: 0, y: 0 }, noncenter: { x: 70, y: 70 } }
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(45, 1920 / 1000, 1, 1000);
 let masExp = 5
 let printerStepZ = 10
-let printerPosition = { x: massPositions.center.x, y: massPositions.center.y, z: 320 }
+let printerPosition = { x: massPositions.center.x, y: massPositions.center.y, z: 300 }
 const masText = document.getElementById("mass-text")
 //camera.position.set(0, 20, 800).setLength(50);
 camera.position.set(30, 6, 0)
