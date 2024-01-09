@@ -9,7 +9,7 @@ const CLEAR_TIME = 10000;
 var shot_started = false
 var step = 1
 var element_speed = 1
-const massPositions = { center: { x: 100, y: 0 }, noncenter: { x: -60, y: 0 } }
+const massPositions = { center: { x: 0, y: 0 }, noncenter: { x: -100, y: -100 } }
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(45, 1920 / 1000, 1, 1000);
 let masExp = 5
@@ -317,9 +317,13 @@ function unblockButtons() {
 }
 function shootBalls() {
   console.log("shot!")
+  serialWebSocket.send("shoot")
 }
 function clearBalls() {
   serialWebSocket.send("G28\r\n")
+  printerPosition.x = massPositions.center.x;
+  printerPosition.y = massPositions.center.y;
+  movePrinter()
 }
 serialWebSocket.onclose = function (e) {
   console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
