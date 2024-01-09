@@ -2,8 +2,8 @@ const { SerialPort } = require('serialport')
 const WebSocket = require('ws');
 
 const wss = new WebSocket.WebSocketServer({ port: 8000 });
-const printer_serialport = new SerialPort({ path: '/dev/ttyUSB0', baudRate: 115200 })
-const shooter_serialport = new SerialPort({ path: '/dev/ttyUSB1', baudRate: 9600 })
+const printer_serialport = new SerialPort({ path: '/dev/ttyPrinter', baudRate: 115200 })
+const shooter_serialport = new SerialPort({ path: '/dev/ttyShooter', baudRate: 9600 })
 
 wss.on('connection', function connection(ws) {
   ws.on('error', console.error);
