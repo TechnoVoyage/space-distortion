@@ -13,8 +13,9 @@ const massPositions = { center: { x: 0, y: 0 }, noncenter: { x: 50, y: 50 } }
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(45, 1920 / 1000, 1, 1000); //FIX!! 
 let masExp = 5
-let printerStepZ = 10
+let printerStepZ = 15
 let printerPosition = { x: massPositions.center.x, y: massPositions.center.y, z: 300 }
+var inMove = false
 const masText = document.getElementById("mass-text")
 //camera.position.set(0, 20, 800).setLength(50);
 camera.position.set(30, 6, 0)
@@ -30,6 +31,7 @@ document.getElementById("move_back_button").disabled = true
 function movePrinter() {
   serialWebSocket.send(`G90\r\n`)
   serialWebSocket.send(`G0 X${printerPosition.x} Y${printerPosition.y} Z${printerPosition.z}\r\n`)
+
 }
 let uniforms = {
   spherePosition: { value: new THREE.Vector3() },
@@ -172,7 +174,7 @@ renderer.setAnimationLoop(_ => {
 
   }
   else {
-    if (!shot_started) unblockButtons();
+    //if (!shot_started) unblockButtons();
     time_buffer = clock.elapsedTime;
     clock.stop();
   }
@@ -250,59 +252,68 @@ document.getElementById('shot_button').onclick = function () {
 
 document.getElementById('move_down_button').onclick = function () {
 
+  if (!inMove) {
+    // camera.position.y += 1;
+    document.getElementById('move_up_button').disabled = false;
 
-  // camera.position.y += 1;
-  document.getElementById('move_up_button').disabled = false;
+    let counter = 0;
+    if (uniforms.planeHeight.value < 5) {
+      step += 1
+      masText.innerHTML = `Масса: 10<sup>${masExp * step}</sup> кг`
+      let interval = setInterval(function () {
+        inMove = true
+        document.getElementById('move_down_button').disabled = true;
+        camera.position.y += 0.1;
+        uniforms.planeHeight.value += 0.1;
+        counter += 1;
+        if (counter == 15) {
+          document.getElementById('move_down_button').disabled = false;
+          clearInterval(interval);
+          inMove = false
+          if (step == 7) document.getElementById('move_down_button').disabled = true;
 
-  let counter = 0;
-  if (uniforms.planeHeight.value < 5) {
-    step += 1
-    masText.innerHTML = `Масса: 10<sup>${masExp * step}</sup> кг`
-    let interval = setInterval(function () {
-      document.getElementById('move_down_button').disabled = true;
-      camera.position.y += 0.1;
-      uniforms.planeHeight.value += 0.1;
-      counter += 1;
-      if (counter == 15) {
-        document.getElementById('move_down_button').disabled = false;
-        clearInterval(interval);
-      }
+        }
 
-    }, 20)
-    printerPosition.z -= printerStepZ;
-    console.log(printerPosition.z)
-    movePrinter()
+      }, 20)
+      printerPosition.z -= printerStepZ;
+      movePrinter()
+    }
+    console.log(step)
+
+
   }
-
-  if (step == 5) document.getElementById('move_down_button').disabled = true;
-
-
 }
 document.getElementById('move_up_button').onclick = function () {
-  console.log(camera.position)
-  console.log(camera.rotation)
-  document.getElementById('move_down_button').disabled = false;
-  let counter = 0;
-  if (uniforms.planeHeight.value > -3) {
-    step -= 1;
-    masText.innerHTML = `Масса: 10<sup>${masExp * step}</sup> кг`
-    let interval = setInterval(function () {
-      document.getElementById('move_up_button').disabled = true;
-      camera.position.y -= 0.1;
-      uniforms.planeHeight.value -= 0.1;
-      counter += 1;
-      if (counter == 15) {
-        document.getElementById('move_up_button').disabled = false;
-        clearInterval(interval);
-      }
+  if (!inMove) {
+    console.log(camera.position)
+    console.log(camera.rotation)
+    document.getElementById('move_down_button').disabled = false;
+    let counter = 0;
+    if (uniforms.planeHeight.value > -3) {
+      step -= 1;
+      masText.innerHTML = `Масса: 10<sup>${masExp * step}</sup> кг`
+      let interval = setInterval(function () {
+        document.getElementById('move_up_button').disabled = true;
+        inMove = true
+        camera.position.y -= 0.1;
+        uniforms.planeHeight.value -= 0.1;
+        counter += 1;
+        if (counter == 15) {
+          document.getElementById('move_up_button').disabled = false;
+          inMove = false
+          clearInterval(interval);
+          if (step == 1) document.getElementById('move_up_button').disabled = true;
+        }
 
-    }, 20)
-    printerPosition.z += printerStepZ;
+      }, 20)
+      printerPosition.z += printerStepZ;
 
-    movePrinter()
+      movePrinter()
+    }
+    console.log(step)
+
+
   }
-  if (step == 1) document.getElementById('move_up_button').disabled = true;
-
 }
 function blockButtons() {
   document.getElementById('move_forward_button').disabled = true;
