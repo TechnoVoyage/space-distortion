@@ -4,7 +4,7 @@ let element_position = 0;
 import * as THREE from './node_modules/three/build/three.module.js';
 
 const TARGET_X = 6;
-const SHOT_TIME = 20000;
+const SHOT_TIME = 60000;
 const CLEAR_TIME = 10000;
 var shot_started = false
 var step = 1
@@ -332,7 +332,8 @@ function unblockButtons() {
 function shootBalls() {
   console.log("shot!")
   var lastZ = printerPosition.z
-  printerPosition.z = 350;
+  if (element_position == 1) lastZ -= 2*printerStepZ;
+  printerPosition.z = 370;
   movePrinter();
   setTimeout(() => {
     serialWebSocket.send("shoot")
