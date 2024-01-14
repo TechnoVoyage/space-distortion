@@ -333,14 +333,14 @@ function shootBalls() {
   console.log("shot!")
   var lastZ = printerPosition.z
   if (element_position == 1) lastZ -= 2*printerStepZ;
-  printerPosition.z = 370;
+  printerPosition.z = 375;
   movePrinter();
   setTimeout(() => {
     serialWebSocket.send("shoot")
     setTimeout(() => {
       printerPosition.z = lastZ
       movePrinter()
-    }, 1000)
+    }, 6000)
   }, 4000)
 
   
