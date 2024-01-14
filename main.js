@@ -5,7 +5,7 @@ import * as THREE from './node_modules/three/build/three.module.js';
 
 const TARGET_X = 6;
 const SHOT_TIME = 20000;
-const CLEAR_TIME = 5000;
+const CLEAR_TIME = 10000;
 var shot_started = false
 var step = 1
 var element_speed = 1
@@ -331,7 +331,18 @@ function unblockButtons() {
 }
 function shootBalls() {
   console.log("shot!")
-  serialWebSocket.send("shoot")
+  var lastZ = printerPosition.z
+  printerPosition.z = 320;
+  movePrinter();
+  setTimeout(() => {
+    serialWebSocket.send("shoot")
+    setTimeout(() => {
+      printerPosition.z = lastZ
+      movePrinter()
+    }, 1000)
+  }, 4000)
+
+  
 }
 function clearBalls() {
   serialWebSocket.send("G28\r\n")
