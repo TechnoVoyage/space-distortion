@@ -13,7 +13,7 @@ const massPositions = { center: { x: 0, y: 0 }, noncenter: { x: 50, y: 50 } }
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(45, 1920 / 1000, 1, 1000); //FIX!! 
 let masExp = 5
-let printerStepZ = 10
+let printerStepZ = 12
 let printerPosition = { x: massPositions.center.x, y: massPositions.center.y, z: 300 }
 var inMove = false
 const masText = document.getElementById("mass-text")
@@ -270,7 +270,7 @@ document.getElementById('move_down_button').onclick = function () {
           document.getElementById('move_down_button').disabled = false;
           clearInterval(interval);
           inMove = false
-          if (step == 5) document.getElementById('move_down_button').disabled = true;
+          if (step == 6) document.getElementById('move_down_button').disabled = true;
 
         }
 
@@ -326,13 +326,13 @@ function unblockButtons() {
   if (element_position == 0) document.getElementById('move_forward_button').disabled = false;
   if (element_position == 1) document.getElementById('move_back_button').disabled = false;
   document.getElementById('shot_button').disabled = false;
-  if (step != 5) document.getElementById('move_down_button').disabled = false;
+  if (step != 6) document.getElementById('move_down_button').disabled = false;
   if (step != 1) document.getElementById('move_up_button').disabled = false;
 }
 function shootBalls() {
   console.log("shot!")
   var lastZ = printerPosition.z
-  printerPosition.z = 320;
+  printerPosition.z = 350;
   movePrinter();
   setTimeout(() => {
     serialWebSocket.send("shoot")
